@@ -7,24 +7,9 @@ import os
 from TradeUtils.TradeMatcher import TradeMatcher
 from TradeUtils.TradeDataPrep import TradeDataPrep
 
-def fix_col_names(cols):
-    fcols: list = []
-    for col in cols:
-        col = col.lower()
-        col = col.replace(" ", "_")
-        col = col.replace("/", "_")
-        fcols.append(col)
-
-    return fcols
-
-
 def get_df_from_csv(filename):
     file = f"txns/{filename}"
     df = pd.read_csv(file)
-    cols = list(df.columns)
-    fcols = fix_col_names(cols)
-    df.columns = fcols
-
     return df
 
 def prep_match_df_for_reporting(df: pd.DataFrame): 

@@ -59,10 +59,10 @@ class TradeMatcher:
             comm = self.close_df.loc[idx, "commission"]
             fees = self.close_df.loc[idx, "fees"]
             amount = self.close_df.loc[idx, "value"]
-            action = self.close_df.loc[idx, "action"] if len(str(self.close_df.loc[idx, "action"]).strip()) > 0 else self.close_df.loc[idx, "type"]
+            trade_action = self.close_df.loc[idx, "trade_action"] if len(str(self.close_df.loc[idx, "trade_action"]).strip()) > 0 else self.close_df.loc[idx, "type"]
             close_dt = self.close_df.loc[idx, "date_time"]
             desc = self.close_df.loc[idx, "description"]
-            t = ( action, close_dt, amount, comm, fees, close_quantity, desc )
+            t = ( trade_action, close_dt, amount, comm, fees, close_quantity, desc )
             matched_rows.append(t)
         # print("No records match ... ")
         if(len(matched_rows) == 0): 
@@ -78,6 +78,6 @@ class TradeMatcher:
         # print(len(self.close_df))
         self.matched_df = self.open_df.explode("output")
         print(self.matched_df.head(2).T)
-        self.matched_df[["close_action", "close_date_time", "close_value", "close_commission", "close_fees", "close_quantity", "close_description"]] = pd.DataFrame(self.matched_df['output'].tolist(), index=self.matched_df.index)
+        self.matched_df[["close_trade_action", "close_date_time", "close_value", "close_commission", "close_fees", "close_quantity", "close_description"]] = pd.DataFrame(self.matched_df['output'].tolist(), index=self.matched_df.index)
         self.matched_df = self.matched_df.drop(columns=["output"])
         return self.matched_df
