@@ -1,12 +1,14 @@
 import pandas
 import pandas as pd
-
+import uuid
 
 class TradeDataPrep:
     """
         Class prepares trades from CSV transaction extract from TastyWorks activity website.
     """
     def __init__(self, hist_df: pandas.DataFrame) -> None:
+        self.cash_settled = ["SPX", "NDX", "RUT"]
+        self.cash_settled_message = ["Removal of option due to exercise", "Removal of option due to assignment"]
         self.hist_df = hist_df.copy()
         self._fix_col_names()
         self._convert_dates()
@@ -15,6 +17,8 @@ class TradeDataPrep:
         self._fix_missing_data()
         self._set_open_close()
         self._set_buy_sell()
+        self._handle_index_options()
+        self._create_record_no()
 
     def _convert_dates(self) -> None:
         self.hist_df["expiry_date"] = pd.to_datetime(self.hist_df.expiration_date, format='%m/%d/%y', errors='coerce')
@@ -63,6 +67,13 @@ class TradeDataPrep:
 
     def _set_buy_sell(self):
         self.hist_df["buy_sell"] = self.hist_df.apply(lambda x: "Buy" if ( x.trade_action in ["BUY_TO_OPEN", "BUY_TO_CLOSE"] ) else "Sell", axis = 1 )
+
+    def _handle_index_options(self): 
+        self.hist_df = self.hist_df[~ ( (self.hist_df.underlying_symbol.isin(self.cash_settled)) & (self.hist_df.description.isin(self.cash_settled_message))  )]
+
+    def _create_record_no(self):
+        self.hist_df['record_no'] = [str(uuid.uuid4()) for _ in range(len(self.hist_df.index))]
+    
 
     def get_prepared_data(self) -> pd.DataFrame: 
         return self.hist_df.copy()
